@@ -1,0 +1,40 @@
+syntax = "proto3"; //Specify proto3 version.
+
+package example; //Optional: unique package name.
+
+service Account { //Service class to be used by the clients
+                  rpc login(LoginRequest) returns (LoginReply){}
+                  rpc register(RegisterRequest) returns (LoginReply){}
+                  rpc logout(LogoutRequest) returns (LoginReply){}
+                  rpc verify(verifyRequest) returns (LoginReply){}
+}
+
+// Information that will be passed between client and service
+// The AddRequest message shape, that had two properties
+// that are both 32 bit integers.
+message LoginRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message verifyRequest {
+    string customerId = 1;
+    string password = 2;
+}
+
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+}
+
+message LogoutRequest {
+    string cid = 1;
+    string password = 2;
+}
+
+// The LoginReply message shape, that had one property
+// that is a 32 bit integer.
+message LoginReply {
+    string result = 1;
+}

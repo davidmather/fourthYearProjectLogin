@@ -1,0 +1,21 @@
+version: "2"
+services:
+  login:
+    image: "node:10"
+    user: "node"
+    container_name: "login"
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ./:/home/node/app
+    ports:
+      - "16001:16001"
+    expose:
+      - "16001"
+    command: "npm start"
+    networks:
+      - shopnetwork
+
+networks:
+  shopnetwork:
