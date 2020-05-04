@@ -24,7 +24,7 @@ var proto = grpc.loadPackageDefinition(
     })
 );
 // Load in our service definition
-const REMOTE_SERVER = process.env.GRPC_SERVER;
+const REMOTE_SERVER = process.env.GRPC_SERVER || "localhost:5001";
 
 //Create gRPC client
 let client = new proto.example.Account(
@@ -100,6 +100,7 @@ app.post('/login', function(req, res) {
         else {
             console.log(response);
             console.log('The Result Is: ' + response.result);
+
             res.clearCookie('sessionCookie');
             res.cookie("user", password, {
                 maxAge: 3600000
@@ -123,7 +124,7 @@ app.post('/logout', function(req, res) {
 
         const params = {
             cid: customerId,
-            user: req.cookies.user
+            password: req.cookies.user
         };
         client.logout(params, function(error, response) {
             if (error){
@@ -139,6 +140,36 @@ app.post('/logout', function(req, res) {
             console.log('The Result Is: ' + response.result); // 'The Result Is: 5'
             res.send(response.result);
         });
+    } else {
+        console.log("Already logged out!");
+        res.send("Already logged out!")
+    }
+
+});
+
+app.post('/getActiveUsers', function(req, res) {
+    if(req.cookies.cid !== undefined && req.cookies.user !== undefined){
+        customerId = req.cookies.cid;
+        const params = {
+            cid: customerId,
+            password: req.cookies.user
+        };
+        console.log("params");
+        console.log(params);
+        client.getActiveUsers(params, function(error, response) {
+            if (error){
+                console.log(error);
+                res.send(JSON.parse({success:false}));
+            }
+            console.log(response);
+
+            var result = {
+                ActiveUsers: response.result,
+                success: true
+            };
+            console.log(result); // 'The Result Is: 5'
+            res.send(result);
+        });
     }
 
 });
@@ -149,7 +180,7 @@ const options = {
 };
 console.log(options);
 
-spdy
+var serverListen = spdy
   .createServer(options, app)
   .listen(port, (error) => {
     if (error) {
@@ -159,3 +190,5 @@ spdy
       console.log('Listening on port: ' + port + '.')
     }
   });
+
+module.exports = {app:app, spdyServer:serverListen};
